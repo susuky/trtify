@@ -282,4 +282,12 @@ class Timer(contextlib.ContextDecorator):
         return time.time()
 
 
-    
+class Bytes(bytes):
+    @classmethod
+    def read_bin(cls, filename='file.bin'):
+        with open(filename, 'rb') as f:
+            return cls(f.read())
+        
+    def to_bin(self, filename='file.bin'):
+        with open(filename, 'wb') as f:
+            f.write(self)
