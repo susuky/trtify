@@ -3,17 +3,22 @@ import datetime
 import contextlib
 import json
 import numpy as np
+import os
 import operator
 import pickle
 import time
+import warnings
+
+from typing import Sequence
 
 __all__ = [
-    'check_dim',
+    'Bytes', 
     'Null',
-    'totuple',
-    'dim2axes',
     'bitmask2int',
     'broadcast_to',
+    'check_dim',
+    'dim2axes',
+    'totuple',
 ]
 
 DATETIME_FORMAT = '%Y-%m-%d_%H-%M-%S'
@@ -283,11 +288,26 @@ class Timer(contextlib.ContextDecorator):
 
 
 class Bytes(bytes):
+    def __new__(cls, self=b'', /, *args, **kwargs):
+        if isinstance(self, str):
+            encoding = kwargs.get('encoding', 'utf-8')
+            errors = kwargs.get('errors', 'strict')
+            self = self.encode(encoding, errors)
+        elif isinstance(self, Sequence):
+            for item in self:
+                if type(item) != int:
+                    raise TypeError('Input must be sequence of integers')                       
+        return super().__new__(cls, self, *args, **kwargs)
+    
     @classmethod
     def read_bin(cls, filename='file.bin'):
+        if not os.path.exists(filename):
+            warnings.warn(f'{filename} does not exist, return empty bytes', RuntimeWarning)
+            return cls()
         with open(filename, 'rb') as f:
             return cls(f.read())
         
     def to_bin(self, filename='file.bin'):
         with open(filename, 'wb') as f:
             f.write(self)
+

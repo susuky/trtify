@@ -14,12 +14,12 @@ __all__ = [
 
 
 class ValidToken(Bytes):
-    def __new__(cls, token=b'', file_name='', **kwargs):
+    def __new__(cls, token=b'', fname='', **kwargs):
         if token and ValidToken.is_valid(token):
             return super().__new__(cls, token, **kwargs)
         elif token:
             warnings.warn(f'{token} is not a valid token, return generated token instead')
-        return cls.read_token(file_name) if file_name else cls.generate_token()
+        return cls.read_token(fname) if fname else cls.generate_token()
 
     @staticmethod
     def is_valid(token) -> bool:
