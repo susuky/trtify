@@ -2,9 +2,9 @@
 Trtify: Simplifying PyTorch to TensorRT Model Conversion with Encryption. Effortlessly transform PyTorch models into TensorRT engines with added encryption capabilities for enhanced security
 
 
-## Instalation
+## Installation
 
-Normal instalation
+Normal installation
 
 ```sh
 git clone https://github.com/susuky/trtify.git
