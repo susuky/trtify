@@ -1,7 +1,7 @@
 
 import numpy as np
 import tensorrt as trt
-from ..utils import bitmask2int, broadcast_to, dim2axes, totuple
+from trtify.utils import bitmask2int, broadcast_to, dim2axes, totuple
 
 VERSION = trt.__version__
 

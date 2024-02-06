@@ -3,9 +3,9 @@
 
 import tensorrt as trt
 
-from ..builder import build_engine, create_profiles
-from ..encryption import Cryptography
-from ..utils import Null
+from trtify.builder import build_engine, create_profiles
+from trtify.encryption import Cryptography
+from trtify.utils import Null
 
 
 __all__ = [

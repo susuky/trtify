@@ -5,7 +5,11 @@ import os
 import warnings
 
 from .base import BaseCudaBackend
+<<<<<<< HEAD
 from ..utils import get_packages
+=======
+from trtify.utils import get_packages
+>>>>>>> dev_encrption
 
 __all__ = [
     'CUDA_BACKEND',
@@ -53,7 +57,6 @@ def switch_backend(backend: str):
 
     if backend not in AVAILABLE_BACKEND:
         raise ValueError(f'Backend `{backend}` is not available')
-    
+
     CUDA_BACKEND = backend
     CudaAPI = _backend.get(CUDA_BACKEND).CudaAPI
-    

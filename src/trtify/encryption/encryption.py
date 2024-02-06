@@ -5,7 +5,7 @@ import base64
 import os
 import warnings
 
-from .utils import Bytes, get_packages
+from trtify.utils import Bytes, get_packages
 
 __all__ = [
     'Cryptography',
@@ -39,7 +39,7 @@ class ValidToken(Bytes):
         
 
 if 'cryptography' not in get_packages():
-    from .utils import Null
+    from ..utils.utils import Null
     warnings.warn(
         'Dependencies are not installed, '
         'using dummy class instead',
