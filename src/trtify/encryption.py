@@ -5,7 +5,7 @@ import base64
 import os
 import warnings
 
-from .utils import Bytes, get_packages
+from trtify.utils import Bytes, get_packages
 
 __all__ = [
     'Cryptography',

@@ -5,11 +5,8 @@ import os
 import warnings
 
 from .base import BaseCudaBackend
-<<<<<<< HEAD
-from ..utils import get_packages
-=======
 from trtify.utils import get_packages
->>>>>>> dev_encrption
+
 
 __all__ = [
     'CUDA_BACKEND',
