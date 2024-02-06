@@ -3,10 +3,9 @@ from __future__ import annotations
 
 import base64
 import os
-import pkg_resources
 import warnings
 
-from .utils import Bytes
+from .utils import Bytes, get_packages
 
 __all__ = [
     'Cryptography',
@@ -38,68 +37,70 @@ class ValidToken(Bytes):
         return cls(base64.urlsafe_b64encode(os.urandom(32)))
         
 
-class Cryptography:
-    def __new__(cls, *args, **kwargs):
-        if 'cryptography' not in (pkg.key for pkg in pkg_resources.working_set):
-            from .utils import Null
-            warnings.warn(
-                'Dependencies are not installed, '
-                'using dummy class instead',
-                RuntimeWarning)
-            return Null()
+if 'cryptography' not in get_packages():
+    from .utils import Null
+    warnings.warn(
+        'Dependencies are not installed, '
+        'using dummy class instead',
+        RuntimeWarning)
+    class Fernet(Null): pass
+    class Cryptography(Null): pass
 
-        from cryptography.fernet import Fernet as _Fernet
+else:
+    from cryptography.fernet import Fernet as _Fernet
 
-        class Fernet(_Fernet):
-            def encrypt(self, data: bytes) -> bytes: return Bytes(super().encrypt(data))
-            def decrypt(self, token: bytes | str, ttl: int | None = None) -> bytes:
-                return Bytes(super().decrypt(token, ttl))
+    class Fernet(_Fernet):
+        def encrypt(self, data: bytes) -> bytes: return Bytes(super().encrypt(data))
+        def decrypt(self, token: bytes | str, ttl: int | None = None) -> bytes:
+            return Bytes(super().decrypt(token, ttl))
+        
+    class Cryptography:
+        def __new__(cls, *args, **kwargs):
+            cls.Fernet = Fernet
+            return object.__new__(cls)
 
-        cls.Fernet = Fernet
-        return object.__new__(cls)
+        def __init__(self, token=b'', keyfname=''):
+            self._token = ValidToken(token, keyfname)
+            self.fernet = self.Fernet(self.token)
 
-    def __init__(self, token=b'', keyfname=''):
-        self._token = ValidToken(token, keyfname)
-        self.fernet = self.Fernet(self.token)
+        @property
+        def token(self):
+            return self._token
+        
+        @token.setter
+        def token(self, token: bytes):
+            self._token = ValidToken(token)
 
-    @property
-    def token(self):
-        return self._token
-    
-    @token.setter
-    def token(self, token: bytes):
-        self._token = ValidToken(token)
+        def encrypt(self, binary: bytes) -> bytes:
+            if not isinstance(binary, bytes):
+                try:
+                    binary = Bytes(binary)
+                except:
+                    warnings.warn(
+                        f'Cannot convert {binary} into bytes, returning empty bytes',
+                        RuntimeWarning
+                    )
+                    binary = b''
+            return self.fernet.encrypt(binary)
 
-    def encrypt(self, binary: bytes) -> bytes:
-        if not isinstance(binary, bytes):
-            try:
-                binary = Bytes(binary)
-            except:
-                warnings.warn(
-                    f'Cannot convert {binary} into bytes',
-                    RuntimeWarning
-                )
-                binary = b''
-        return self.fernet.encrypt(binary)
+        def decrypt(self, binary: bytes) -> bytes:
+            if not isinstance(binary, bytes):
+                try:
+                    binary = bytes(binary)
+                except:
+                    warnings.warn(
+                        f'Cannot convert {binary} into bytes, returning empty bytes',
+                        RuntimeWarning
+                    )
+                    binary = b''
+            return self.fernet.decrypt(binary)
 
-    def decrypt(self, binary: bytes) -> bytes:
-        if not isinstance(binary, bytes):
-            try:
-                binary = bytes(binary)
-            except:
-                warnings.warn(
-                    f'Cannot convert {binary} into bytes',
-                    RuntimeWarning
-                )
-                binary = b''
-        return self.fernet.decrypt(binary)
+        def read_key(self, keyfname='key.bin'):
+            self._token = ValidToken.read_token(keyfname)
+            return self.token
 
-    def read_key(self, keyfname='key.bin'):
-        self._token = ValidToken.read_token(keyfname)
-        return self.token
-
-    def export_key(self, keyfname='key.bin'):
-        self.token.to_bin(keyfname)
+        def export_key(self, keyfname='key.bin'):
+            self.token.to_bin(keyfname)
 
 
 def read_key(keyfname='key.bin'):
