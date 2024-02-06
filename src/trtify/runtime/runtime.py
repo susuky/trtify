@@ -2,9 +2,9 @@
 import numpy as np
 import tensorrt as trt
 
-from .cuda_backend import CudaAPI as cuda
-from .encryption import Cryptography
-from .utils import check_dim, Null, Timer
+from trtify.cuda_backend import CudaAPI as cuda
+from trtify.encryption import Cryptography
+from trtify.utils.utils import check_dim, Null, Timer
 
 __all__ = [
     'cuda',

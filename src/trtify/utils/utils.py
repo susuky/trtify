@@ -1,4 +1,7 @@
 
+import warnings
+warnings.filterwarnings('ignore', category=DeprecationWarning)
+
 import datetime
 import contextlib
 import json
@@ -6,6 +9,7 @@ import numpy as np
 import os
 import operator
 import pickle
+import pkg_resources # DeprecationWarning
 import time
 import warnings
 
@@ -18,6 +22,7 @@ __all__ = [
     'broadcast_to',
     'check_dim',
     'dim2axes',
+    'get_packages',
     'totuple',
 ]
 
@@ -311,3 +316,6 @@ class Bytes(bytes):
         with open(filename, 'wb') as f:
             f.write(self)
 
+
+def get_packages():
+    return [pkg.key for pkg in pkg_resources.working_set]

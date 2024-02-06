@@ -1,12 +1,11 @@
 
-import warnings
-warnings.filterwarnings('ignore', category=DeprecationWarning)
 
 import numpy as np
-import pkg_resources
 import os
+import warnings
 
 from .base import BaseCudaBackend
+from trtify.utils import get_packages
 
 __all__ = [
     'CUDA_BACKEND',
@@ -20,7 +19,7 @@ _implemented_backends = (
 
 
 def _get_backend() -> tuple[str, list[str]]:
-    packages = [pkg.key for pkg in pkg_resources.working_set]
+    packages = get_packages()
     available = [c for c in _implemented_backends if c in packages]
     if not available:
         raise ImportError('No available CUDA backend')
@@ -54,7 +53,6 @@ def switch_backend(backend: str):
 
     if backend not in AVAILABLE_BACKEND:
         raise ValueError(f'Backend `{backend}` is not available')
-    
+
     CUDA_BACKEND = backend
     CudaAPI = _backend.get(CUDA_BACKEND).CudaAPI
-    

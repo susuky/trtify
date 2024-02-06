@@ -1,8 +1,8 @@
 
 import tensorrt as trt
 
-from .encryption import Cryptography
-from .utils import Null
+from trtify.encryption import Cryptography
+from trtify.utils import Null
 
 __all__ = [
     'create_profile_config',
@@ -155,7 +155,7 @@ def build_engine(
         key_path (str): None
         verbose_token (bool): True
     '''
-    from .network_definition import NetworkDefinition
+    from ..network_definition import NetworkDefinition
     config = builder.create_builder_config()
 
     if isinstance(network, NetworkDefinition):
